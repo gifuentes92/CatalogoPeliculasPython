@@ -1,38 +1,39 @@
-"""El objetivo consiste en desarrollar un programa que permita llevar un registro de películas 
-aplicando conceptos de programación orientada a objetos.
- El funcionamiento esperado es el siguiente:
- Al ejecutar el programa se solicita ingresar el nombre del catálogo de películas:
- Si el catálogo de películas no existe se creará uno nuevo. Este catálogo se va a guardar en un 
-archivo txt donde posteriormente se guardarán las películas. Si el catálogo existe se podrá 
-seguir modificando el archivo.
- Se debe mostrar un menú de opciones, que permita realizar las siguientes operaciones:
-    1. Agregar Película
-    2. Listar Películas
-    3. Eliminar catálogo películas
-    4. Salir
+import os
 
-    
-    Funcionamiento de las opciones:
- ● Agregar Película: se va a solicitar el nombre de la película y esta película se va a guardar 
-en el archivo txt.
- ● Listar Peliculas: va a mostrar todas las peliculas del catalogo y guardadas en el archivo 
-txt.
- ● Eliminar catálogo: elimina el archivo txt que corresponde al catálogo de películas.
- ● Salir: debe finalizar el programa mostrando un mensaje al usuario.
- Implementación POO:
- El programa debe implementar programación orientada a objetos. Se solicita:
- ● Clase Pelicula. 
-○ Uno de sus atributos debe ser privado
- ● Clase CatalogoPelicula
- ○ atributo nombre
- ○ atributo ruta_archivo
- ○ métodos: agregar, listar, eliminar
+class Pelicula:
+    def __init__(self, titulo, director, anio):
+        self.titulo = titulo
+        self.director = director
+        self.anio = anio
 
-    """
+    def __str__(self):
+        return f"Película: {self.titulo}, {self.director}, {self.anio}"
 
-import os 
+class catalogoPeliculas:
+    ruta_archivo = "catalogo.txt"
 
+    @classmethod
+    def agregar_pelicula(cls, pelicula):
+        with open(cls.ruta_archivo, "a", encoding='utf8') as archivo:
+            archivo.write(f"{pelicula.titulo},{pelicula.director},{pelicula.anio}\n")
 
+    @classmethod
+    def listar_peliculas(cls):
+        try:
+            with open(cls.ruta_archivo, "r", encoding='utf8') as archivo:
+                for linea in archivo:
+                    titulo, director, anio = linea.strip().split(",")
+                    print(f"Película: {titulo}, {director}, {anio}")
+        except FileNotFoundError:
+            print("El catálogo está vacío.")
+
+    @classmethod
+    def eliminar_catalogo(cls):
+        if os.path.exists(cls.ruta_archivo):
+            os.remove(cls.ruta_archivo)
+            print(f"Catálogo {cls.ruta_archivo} eliminado con éxito.")
+        else:
+            print("El catálogo no existe.")
 
 def mostrar_menu():
     print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
@@ -43,24 +44,32 @@ def mostrar_menu():
     print("4. Salir")
     print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
 
-    def main():
-        catalogo = CatalogoPeliculas("catalogo.txt")
-        while True:
-            mostrar_menu()
+def main():
+    while True:
+        mostrar_menu()
+        try:
             opcion = int(input("Ingrese una opción: "))
             if opcion == 1:
-                titulo= input("Ingrese el título de la película: ")
-                director= input("Ingrese el director de la película: ")
-                anio= input("Ingrese el año de la película: ")
-                catalogo.agregar(titulo, director, anio)
+                titulo = input("Ingrese el título de la película: ")
+                director = input("Ingrese el director de la película: ")
+                anio = input("Ingrese el año de la película: ")
+                pelicula = Pelicula(titulo, director, anio)
+                catalogoPeliculas.agregar_pelicula(pelicula)
                 print("Película agregada con éxito :)")
             elif opcion == 2:
-                listar_peliculas(catalogo)
+                catalogoPeliculas.listar_peliculas()
             elif opcion == 3:
-                eliminar_catalogo(catalogo)
+                catalogoPeliculas.eliminar_catalogo()
             elif opcion == 4:
-                print("Gracias por usar el programa")
+                print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
+                print("Gracias por usar el programa!")
+                print("~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°~°")
                 break
             else:
                 print("Opción inválida")
+        except ValueError:
+            print("Por favor, ingrese un número válido.")
+        except Exception as e:
+            print(f"Ha ocurrido un error!: {e}")
 
+main()
